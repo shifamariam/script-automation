@@ -1,0 +1,46 @@
+#!/bin/sh
+sudo apt-get update
+echo "Installing git"
+sudo apt-get -y install git
+
+echo "Searching for java"
+java=`which java`
+if [[ $java = "" ]]
+then 
+	sudo apt-get -y install openjdk-7-jdk
+else
+	echo "already java installed"
+fi
+
+echo "installing ANT"
+sudo apt-get -y install ant
+echo "PATH=$PATH:/usr/share/ant/bin:/usr/lib/jvm/java-7-openjdk-amd64/bin:/usr/share/tomcat7/bin" > /etc/environment
+echo "ANT_HOME= /usr/share/ant" >> /etc/environment
+echo "JAVA_HOME= /usr/lib/jvm/java-7-openjdk-amd64" >> /etc/environment
+
+echo "Installing Jenkins"
+wget -q -O - https://jenkins-ci.org/debian/jenkins-ci.org.key | sudo apt-key add -
+sudo sh -c 'echo deb http://pkg.jenkins-ci.org/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+sudo apt-get -y install jenkins
+
+sed -i -e 's/8080/8081/g' /etc/default/jenkins
+echo "Starting Jenkins"
+sudo service jenkins restart
+
+echo "Installing Tomcat7"
+sudo apt-get -y install tomcat7
+echo "CATALINA_HOME= /usr/share/tomcat7" >> /etc/environment
+echo "Starting Tomcat"
+sudo service tomcat7 start
+
+echo "Installing Tomcat docs, admin and examples"
+sudo apt-get -y install tomcat7-docs tomcat7-admin tomcat7-examples
+sudo service tomcat7 restart
+echo "Setting username and password"
+echo "<tomcat-users>
+    <user username=\"admin\" password=\"password\" roles=\"manager-gui,admin-gui\"/>
+</tomcat-users>" > /etc/tomcat7/tomcat-users.xml
+echo "Restarting Tomcat"
+sudo service tomcat7 restart
+
+
