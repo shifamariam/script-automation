@@ -1,8 +1,11 @@
+##Shell script to install tools like Git, Java, ANT,MAVEN, Jenkins and Tomcat
 #!/bin/sh
 sudo apt-get update
+#Installing Git
 echo "Installing git"
 sudo apt-get -y install git
 
+#Checking for Java installation
 echo "Searching for java"
 java=`which java`
 if [[ $java = "" ]]
@@ -14,31 +17,40 @@ else
 	echo "already java installed"
 fi
 
+#Installing ANT
 echo "installing ANT"
 sudo apt-get -y install ant
+
+#Installing Maven
 echo "installing MAVEN"
 sudo apt-get -y install maven
+
+#Setting up Path variables and Environment variables
 echo "PATH=$PATH:/usr/share/ant/bin:/usr/lib/jvm/java-8-oracle/bin:/usr/share/tomcat7/bin:/usr/share/maven/bin" > /etc/environment
 echo "ANT_HOME=/usr/share/ant" >> /etc/environment
 echo "JAVA_HOME=/usr/lib/jvm/java-8-oracle" >> /etc/environment
 echo "M2_HOME=/usr/share/maven" >> /etc/environment
 
+#Installing Jenkins
 echo "Installing Jenkins"
 wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -
 sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
 sudo apt-get update
 sudo apt-get install jenkins
 
+#Port-change in Jenkins
 sed -i -e 's/8080/8081/g' /etc/default/jenkins
 echo "Starting Jenkins"
 sudo service jenkins restart
 
+#Tomcat Installation
 echo "Installing Tomcat7"
 sudo apt-get -y install tomcat7
 echo "CATALINA_HOME=/usr/share/tomcat7" >> /etc/environment
 echo "Starting Tomcat"
 sudo service tomcat7 start
 
+#Installing other tomcat essentials
 echo "Installing Tomcat docs, admin and examples"
 sudo apt-get -y install tomcat7-docs tomcat7-admin tomcat7-examples
 sudo service tomcat7 restart
